@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"net/http/httputil"
@@ -36,14 +36,14 @@ func (s *Server) Handle(rw http.ResponseWriter, r *http.Request) {
 	}
 	req, err := SignRequest(s.config, r)
 	if err != nil {
-		// Crash app because there is a problem with signing request
-		panic(err)
+		log.Error("Error signing request: %s", err.Error())
+		return
 	}
 	originalResponse, err := http.DefaultClient.Do(req)
 
 	if err != nil {
-		// Crash app because there is a problem with sending request
-		panic(err)
+		log.Error("Error sending request: %s", err.Error())
+		return
 	}
 	copyHeader(rw.Header(), originalResponse.Header)
 	rw.WriteHeader(originalResponse.StatusCode)
@@ -52,7 +52,7 @@ func (s *Server) Handle(rw http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) Start() {
-	fmt.Println("Starting server on port", s.config.Port)
+	log.Info("Starting server on port", s.config.Port)
 	err := http.ListenAndServe(s.config.Port, http.HandlerFunc(s.Handle))
 	if err != nil {
 		// Crash app because there is a problem with starting server

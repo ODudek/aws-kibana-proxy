@@ -18,7 +18,7 @@ func GetAWSConfig() (aws.Config, error) {
 	return config.LoadDefaultConfig(context.TODO())
 }
 
-func calculateSHA256Hash(reader io.Reader) (string, error) {
+func CalculateSHA256Hash(reader io.Reader) (string, error) {
 
 	hash := sha256.New()
 	if _, err := io.Copy(hash, reader); err != nil {
@@ -31,7 +31,7 @@ func calculateSHA256Hash(reader io.Reader) (string, error) {
 	return hashHex, nil
 }
 
-func prepareRemoteUrl(endpoint string, r *http.Request) (*url.URL, error) {
+func PrepareRemoteUrl(endpoint string, r *http.Request) (*url.URL, error) {
 	remote, err := url.Parse(endpoint)
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func prepareRemoteUrl(endpoint string, r *http.Request) (*url.URL, error) {
 }
 
 func SignRequest(config *AppConfig, r *http.Request) (*http.Request, error) {
-	remote, err := prepareRemoteUrl(config.EsEndpoint, r)
+	remote, err := PrepareRemoteUrl(config.EsEndpoint, r)
 	if err != nil {
 		return nil, err
 	}
@@ -70,9 +70,14 @@ func SignRequest(config *AppConfig, r *http.Request) (*http.Request, error) {
 		return nil, err
 	}
 
-	hash, err := calculateSHA256Hash(bytes.NewBuffer(body))
+	hash, err := CalculateSHA256Hash(bytes.NewBuffer(body))
 
-	v4.NewSigner().SignHTTP(rr.Context(), creds, rr, hash, "es", cfg.Region, time.Now())
+	err = v4.NewSigner().SignHTTP(rr.Context(), creds, rr, hash, "es", cfg.Region, time.Now())
+
+	if err != nil {
+		return nil, err
+	}
+
 	rr.Header.Set("kbn-version", r.Header.Get("kbn-version"))
 	rr.Header.Set("User-Agent", r.Header.Get("User-Agent"))
 
