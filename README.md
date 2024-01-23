@@ -1,7 +1,7 @@
 # AWS Kibana Proxy
 
 ## How to run
-To configure the proxy, you need the `config.yaml` file, which consists of the following fields:
+To configure the proxy, you need set `CONFIG_PATH` environment variable and the `config.yaml` file in path, which consists of the following fields:
 
 1. Port on which the proxy server should be launched, for example, `:1234`.
 2. ElasticSearch endpoint, for example, `https://xxx.eu-central-1.es.amazonaws.com`.

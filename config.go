@@ -28,7 +28,8 @@ func LoadConfig(filename string) (AppConfig, error) {
 }
 
 func NewAppConfig() *AppConfig {
-	config, err := LoadConfig("./config.yaml")
+	configPath := os.Getenv("CONFIG_PATH")
+	config, err := LoadConfig(configPath)
 	if err != nil {
 		// stop application when there's problem with loading config
 		panic(err)
