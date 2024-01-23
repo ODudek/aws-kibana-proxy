@@ -9,7 +9,8 @@ import (
 )
 
 type Server struct {
-	config *AppConfig
+	config     *AppConfig
+	httpClient *http.Client
 }
 
 func (s *Server) createProxy() *httputil.ReverseProxy {
@@ -39,7 +40,7 @@ func (s *Server) Handle(rw http.ResponseWriter, r *http.Request) {
 		log.Error("Error signing request: %s", err.Error())
 		return
 	}
-	originalResponse, err := http.DefaultClient.Do(req)
+	originalResponse, err := s.httpClient.Do(req)
 
 	if err != nil {
 		log.Error("Error sending request: %s", err.Error())
@@ -63,5 +64,6 @@ func (s *Server) Start() {
 func NewServer(config *AppConfig) *Server {
 	return &Server{
 		config,
+		http.DefaultClient,
 	}
 }
