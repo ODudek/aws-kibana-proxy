@@ -37,13 +37,13 @@ func (s *Server) Handle(rw http.ResponseWriter, r *http.Request) {
 	}
 	req, err := SignRequest(s.config, r)
 	if err != nil {
-		log.Error("Error signing request: %s", err.Error())
+		log.Error("Error signing request:", err.Error())
 		return
 	}
 	originalResponse, err := s.httpClient.Do(req)
 
 	if err != nil {
-		log.Error("Error sending request: %s", err.Error())
+		log.Error("Error sending request:", err.Error())
 		return
 	}
 	copyHeader(rw.Header(), originalResponse.Header)
